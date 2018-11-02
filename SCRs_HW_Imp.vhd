@@ -7,8 +7,7 @@ use IEEE.numeric_std.all;
 entity ThreePhase_SCRs_Controller is
 
 generic (FullCycle_Counts:integer:=2000000      -- =20ms/10ns; 20ms is period of sinewave
-	     );
-
+	);
 port (
       clock        : in  std_logic;
       reset        : in  std_logic;
@@ -41,37 +40,6 @@ signal SW2_CrossUp_Pulse  : std_logic;
 signal SW2_CrossDwn_Pulse : std_logic;
 signal SW3_CrossUp_Pulse  : std_logic;
 signal SW3_CrossDwn_Pulse : std_logic;
-  
-signal LED_Sig    : std_logic_vector(7 downto 0);
-
-signal Pulse_sig      : std_logic; 
-signal Sine1_out      : std_logic_vector(11 downto 0);--integer range -1241 to 1241; 
-signal Sine1_out_dly  : std_logic_vector(11 downto 0);--integer range -1241 to 1241;
-signal Sine2_out      : std_logic_vector(11 downto 0);--integer range -1241 to 1241; 
-signal Sine2_out_dly  : std_logic_vector(11 downto 0);--integer range -1241 to 1241;
-signal Sine3_out      : std_logic_vector(11 downto 0);--integer range -1241 to 1241; 
-signal Sine3_out_dly  : std_logic_vector(11 downto 0);--integer range -1241 to 1241;
-signal Sine1_out_dly2 : std_logic_vector(11 downto 0);--integer range -1241 to 1241;
-
-
-signal Sinewave1_CrossUp      :  std_logic;
-signal Sinewave1_CrossUp_dly1 :  std_logic;
-signal Sinewave1_CrossUp_dly2 :  std_logic;
-signal Sinewave1_CrossDwn     :  std_logic;
-signal Sinewave1_CrossDwn_dly1:  std_logic;
-signal Sinewave1_CrossDwn_dly2:  std_logic;
-signal Sinewave2_CrossUp      :  std_logic;
-signal Sinewave2_CrossUp_dly1 :  std_logic;
-signal Sinewave2_CrossUp_dly2 :  std_logic;
-signal Sinewave2_CrossDwn     :  std_logic;
-signal Sinewave2_CrossDwn_dly1:  std_logic;
-signal Sinewave2_CrossDwn_dly2:  std_logic;
-signal Sinewave3_CrossUp      :  std_logic;
-signal Sinewave3_CrossUp_dly1 :  std_logic;
-signal Sinewave3_CrossUp_dly2 :  std_logic;
-signal Sinewave3_CrossDwn     :  std_logic;
-signal Sinewave3_CrossDwn_dly1:  std_logic;
-signal Sinewave3_CrossDwn_dly2:  std_logic;
 
 signal Thyristors_Sig   : std_logic_vector(5 downto 0);
 
@@ -88,50 +56,44 @@ signal index3       : integer range 0 to 400;  -- 110001111  399
 
 signal SynchFlag   : std_logic_vector(5 downto 0);
 
-
 begin
-
 
 PhaseSELECTION: process(clock,reset)
-
 begin
+if(reset='1') then
 
- if(reset='1') then
-
-       FiringPulse_RisingEdge<=0;
-       FiringPulse_FallingEdge<=0;
-       
+  FiringPulse_RisingEdge<=0;
+  FiringPulse_FallingEdge<=0;
+  
  elsif(rising_edge(clock)) then
-     
-        if(phaseSelect="000001") then       --zero degrees delay
-           FiringPulse_RisingEdge<=277778; --0+60 degrees
-           FiringPulse_FallingEdge<=833333; --120 degrees +30 degrees
-        elsif(phaseSelect="000010")then     --15 degrees degrees delay
-           FiringPulse_RisingEdge<=347222;
-           FiringPulse_FallingEdge<=833333;
-        elsif(phaseSelect="000100")then      --30 degrees degrees delay
-            FiringPulse_RisingEdge<=416667;
-            FiringPulse_FallingEdge<=833333;
-        elsif(phaseSelect="001000")then     --45 degrees degrees delay
-            FiringPulse_RisingEdge<=486111;
-            FiringPulse_FallingEdge<=833333;
-         elsif(phaseSelect="010000")then     --60 degrees degrees delay
-            FiringPulse_RisingEdge<=555556;
-            FiringPulse_FallingEdge<=833333;
-         elsif(phaseSelect="010000")then      --75 degrees degrees delay
-            FiringPulse_RisingEdge<=625000;
-            FiringPulse_FallingEdge<=833333;  
-        elsif(phaseSelect="100000")then       --90 degrees degrees delay
-            FiringPulse_RisingEdge<=694444;
-            FiringPulse_FallingEdge<=833333;  
-        else
-            FiringPulse_RisingEdge<=277778;    --zero degrees delay
-            FiringPulse_FallingEdge<=833333;   
-        end if;
+   if(phaseSelect="000001") then     --zero degrees delay
+       FiringPulse_RisingEdge<=333333; --0+60 degrees: pulse duration=120degrees(6.67ms)
+       FiringPulse_FallingEdge<=1000000; --120 degrees +60 degrees
+   elsif(phaseSelect="000010")then     --15 degrees degrees delay:pulse duration=105degrees(5.83ms)
+       FiringPulse_RisingEdge<=416667;
+       FiringPulse_FallingEdge<=1000000;  
+   elsif(phaseSelect="000100")then     --30 degrees degrees delay:pulse duration=90degrees(5ms)
+       FiringPulse_RisingEdge<=500000;
+       FiringPulse_FallingEdge<=1000000;
+   elsif(phaseSelect="001000")then      --45 degrees degrees delay: pulse duration=75degrees(4.16ms)
+       FiringPulse_RisingEdge<=583333;
+       FiringPulse_FallingEdge<=1000000;
+   elsif(phaseSelect="010000")then     --60 degrees degrees delay: pulse duration=60degrees(3.33ms)
+       FiringPulse_RisingEdge<=666667;
+       FiringPulse_FallingEdge<=1000000;
+   elsif(phaseSelect="010000")then      --75 degrees degrees delay: pulse duration=45degrees(2.5ms)
+       FiringPulse_RisingEdge<=750000;
+       FiringPulse_FallingEdge<=1000000;  
+    elsif(phaseSelect="100000")then       --90 degrees degrees delay: pulse duration=30degrees(1.67ms)
+       FiringPulse_RisingEdge<=833333;
+       FiringPulse_FallingEdge<=1000000;  
+     else
+       FiringPulse_RisingEdge<=333333;    --zero degrees delay
+       FiringPulse_FallingEdge<=1000000;   
+     end if;
 
 end if;
-
-end process PhaseSELECTION;
+end process PhaseSELECTION
 
 ----------------------------------------------------
 --squareWaves generation/ Real signals input
