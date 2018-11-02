@@ -35,9 +35,7 @@ signal Sine3_out      : integer range -1241 to 1241;
 signal Sine3_Rec      : integer range -1241 to 1241; 
 signal Sine3_out_dly  : integer range -1241 to 1241;
 
-
 signal AC_out       : integer range -1241 to 5000;
-
 
 signal Sinewave1_CrossUp:  std_logic;
 signal Sinewave1_CrossUp_dly1:  std_logic;
@@ -66,10 +64,8 @@ signal index2      : integer range 0 to 400;  -- 110001111  399
 signal index3      : integer range 0 to 400;  -- 110001111  399
 
 
-
 type SineConstants_Array is array(0 to 399) of integer range -1241 to 1241;     --signed(12 downto 0); --400 constants 11 bits each
 constant SineConstants  : SineConstants_Array := (
-
 19,39,58,78,97,117,136,156,175,194,213,233,252,271,290,309,328,346,365,384,402,420,439,457,475,493,511,528,546,563,581,
 598,615,632,649,665,681,698,714,730,745,761,776,791,806,821,835,850,864,878,891,905,918,931,944,956,969,981,993,1004,1015,
 1027,1037,1048,1058,1068,1078,1088,1097,1106,1115,1123,1131,1139,1147,1154,1161,1168,1174,1180,1186,1192,1197,1202,1207,
