@@ -8,8 +8,8 @@ entity ThreePhase_SCRs_Controller is
 
 generic (HalfCycle_Counts:integer:=1000000;       -- =20ms/10ns; 20ms is period of sinewave
          FiringPulse_RisingEdge:integer:=333333;  -- =60degrees+ Alpha=0 degree
-	     FiringPulse_FallingEdge:integer:=1000000  -- =60degrees+ Alpha+120 degree
-	     );
+	 FiringPulse_FallingEdge:integer:=1000000  -- =60degrees+ Alpha+120 degree
+	);
 
 port (
       clock        : in  std_logic;
@@ -21,24 +21,7 @@ end ThreePhase_SCRs_Controller;
 
 architecture rtl of ThreePhase_SCRs_Controller is
 
-signal SW1_CrossUp_Pulse  : std_logic;
-signal SW1_CrossDwn_Pulse : std_logic;
-signal SW2_CrossUp_Pulse : std_logic;
-signal SW2_CrossDwn_Pulse : std_logic;
-signal SW3_CrossUp_Pulse : std_logic;
-signal SW3_CrossDwn_Pulse : std_logic;
-
-signal Counter1Sync : std_logic;
-signal Counter2Sync : std_logic;
-signal Counter3Sync : std_logic;
-signal Counter4Sync : std_logic;
-signal Counter5Sync : std_logic;
-signal Counter6Sync : std_logic;
-
-
-
-signal LED_Sig    : std_logic_vector(7 downto 0);
-
+signal LED_Sig        : std_logic_vector(7 downto 0);
 signal Pulse_sig      : std_logic; 
 signal Sine1_out      : integer range -1241 to 1241; 
 signal Sine1_Rec      : integer range -1241 to 1241; 
@@ -52,37 +35,22 @@ signal Sine3_out      : integer range -1241 to 1241;
 signal Sine3_Rec      : integer range -1241 to 1241; 
 signal Sine3_out_dly  : integer range -1241 to 1241;
 
-signal Sine1_out_dly2 : integer range -1241 to 1241; 
 
-signal AC_out1      : integer range -1241 to 5000; 
-signal AC_out2      : integer range -1241 to 5000; 
-signal AC_out3      : integer range -1241 to 5000; 
-signal AC_out4      : integer range -1241 to 5000; 
-signal AC_out5      : integer range -1241 to 5000; 
-signal AC_out6      : integer range -1241 to 5000; 
-signal AC_out7      : integer range -1241 to 5000;
-signal AC_out8      : integer range -1241 to 5000;
 signal AC_out       : integer range -1241 to 5000;
 
 
 signal Sinewave1_CrossUp:  std_logic;
 signal Sinewave1_CrossUp_dly1:  std_logic;
-signal Sinewave1_CrossUp_dly2:  std_logic;
 signal Sinewave1_CrossDwn: std_logic;
 signal Sinewave1_CrossDwn_dly1:  std_logic;
-signal Sinewave1_CrossDwn_dly2:  std_logic;
 signal Sinewave2_CrossUp:  std_logic;
 signal Sinewave2_CrossUp_dly1:  std_logic;
-signal Sinewave2_CrossUp_dly2:  std_logic;
 signal Sinewave2_CrossDwn: std_logic;
 signal Sinewave2_CrossDwn_dly1:  std_logic;
-signal Sinewave2_CrossDwn_dly2:  std_logic;
 signal Sinewave3_CrossUp:  std_logic;
 signal Sinewave3_CrossUp_dly1:  std_logic;
-signal Sinewave3_CrossUp_dly2:  std_logic;
 signal Sinewave3_CrossDwn: std_logic;
 signal Sinewave3_CrossDwn_dly1:  std_logic;
-signal Sinewave3_CrossDwn_dly2:  std_logic;
 
 signal Thyristors_Sig   : std_logic_vector(5 downto 0);
 
@@ -97,22 +65,6 @@ signal index1      : integer range 0 to 400;  -- 110001111  399
 signal index2      : integer range 0 to 400;  -- 110001111  399
 signal index3      : integer range 0 to 400;  -- 110001111  399
 
---attribute mark_debug: string;
---attribute mark_debug of clock: signal is "true";
---attribute mark_debug of reset: signal is "true";
---attribute mark_debug of Sinewave1_CrossUp: signal is "true";
---attribute mark_debug of Sinewave1_CrossDwn: signal is "true";
---attribute mark_debug of Sinewave2_CrossUp: signal is "true";
---attribute mark_debug of Sinewave2_CrossDwn: signal is "true";
---attribute mark_debug of Sinewave3_CrossUp: signal is "true";
---attribute mark_debug of Sinewave3_CrossDwn: signal is "true";
---attribute mark_debug of PhaseCounter1: signal is "true";
---attribute mark_debug of PhaseCounter4: signal is "true";
---attribute mark_debug of PhaseCounter2: signal is "true";
---attribute mark_debug of PhaseCounter3: signal is "true";
---attribute mark_debug of PhaseCounter5: signal is "true";
---attribute mark_debug of PhaseCounter6: signal is "true";
---attribute mark_debug of Thyristors_Sig: signal is "true";
 
 
 type SineConstants_Array is array(0 to 399) of integer range -1241 to 1241;     --signed(12 downto 0); --400 constants 11 bits each
@@ -142,13 +94,9 @@ begin
 --Sine waves generation:
 --------------------------------------------------------------------------
 SineWaves:process (clock,reset)
-
-
 variable counter      : integer range 0 to 5000;
-
 begin
-
-   if(reset='1') then
+  if(reset='1') then
 		Sine1_out<=0;
 		Sine2_out<=0;
 		Sine3_out<=0;
@@ -200,9 +148,9 @@ begin
         Sine2_out_dly<=0;
         Sine3_out_dly<=0;
        
-		Sinewave1_CrossDwn<='0';
-		Sinewave1_CrossDwn_dly1<='0';
-		Sinewave1_CrossDwn_dly2<='0';
+        Sinewave1_CrossDwn<='0';
+	Sinewave1_CrossDwn_dly1<='0';
+        Sinewave1_CrossDwn_dly2<='0';
         
         Sinewave1_CrossUp<='0';
         Sinewave1_CrossUp_dly1<='0';
@@ -225,8 +173,7 @@ begin
         Sinewave3_CrossUp_dly2<='0';
               
     elsif(rising_edge(clock)) then
-	 -------------------------------------------------
-	  Sinewave1_CrossUp_dly1<=Sinewave1_CrossUp;
+      Sinewave1_CrossUp_dly1<=Sinewave1_CrossUp;
       Sinewave1_CrossUp_dly2<= Sinewave1_CrossUp_dly1;
      
       Sinewave1_CrossDwn_dly1<=Sinewave1_CrossDwn;
@@ -243,8 +190,8 @@ begin
              
       Sinewave3_CrossDwn_dly1<=Sinewave3_CrossDwn;
       Sinewave3_CrossDwn_dly2<= Sinewave3_CrossDwn_dly1;
-	 -------------------------------------------------
-         Sine1_out_dly<=Sine1_out;
+
+      Sine1_out_dly<=Sine1_out;
             if((to_signed(Sine1_out,12)<=0)AND(to_signed(Sine1_out_dly,12)>0)) then
               Sinewave1_CrossDwn<='1';
               Sinewave1_CrossUp<='0';
@@ -252,9 +199,9 @@ begin
             elsif((to_signed(Sine1_out,12)>=0)AND(to_signed(Sine1_out_dly,12)<0))then
               Sinewave1_CrossUp<='1';
               Sinewave1_CrossDwn<='0';
-		    end if; 
+            end if; 
 				
-         Sine2_out_dly <=Sine2_out;
+      Sine2_out_dly <=Sine2_out;
            if((to_signed(Sine2_out,12)<=0)AND(to_signed(Sine2_out_dly,12)>0))then
               Sinewave2_CrossDwn<='1';
 			  Sinewave2_CrossUp<='0';
@@ -424,7 +371,6 @@ end process;
      Thyristors(4)<=Thyristors_Sig(4);
      Thyristors(5)<=Thyristors_Sig(5);
      
-
 end rtl;
 
  
